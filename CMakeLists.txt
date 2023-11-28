@@ -3,4 +3,7 @@ project(grepy)
 
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(grepy main.cpp)
+add_executable(grepy main.cpp
+        logger.cpp
+        logger.h
+        common.h)

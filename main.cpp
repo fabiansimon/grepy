@@ -1,6 +1,8 @@
 #include <iostream>
 #include <string>
 
+#include "logger.h"
+
 int count_digits(const std::string& input) {
     int count = 0;
     for (const char& c : input) {
@@ -49,18 +51,24 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
 
 int main(int argc, char* argv[]) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
-    std::cout << "Logs from your program will appear here" << std::endl;
+    // Logger::log_debug("Logs from your program will appear here");
 
-    if (argc != 3) {
-        std::cerr << "Expected two arguments" << std::endl;
+    if (argc < 2) {
+        Logger::log_error("Expected at least two arguments");
         return 1;
+    }
+
+    std::string pattern_arg;
+
+    for (int i = 1; i < argc; ++i) {
+        Logger::log_success(argv[i]);
     }
 
     std::string flag = argv[1];
     std::string pattern = argv[2];
 
     if (flag != "-E") {
-        std::cerr << "Expected first argument to be '-E'" << std::endl;
+        Logger::log_error("Expected first argument to be '-E'");
         return 1;
     }
 
@@ -69,13 +77,15 @@ int main(int argc, char* argv[]) {
 
     try {
         if (match_pattern(input_line, pattern)) {
+            Logger::log_debug("Success");
             return 0;
         } else {
+            Logger::log_debug("Failure");
             return 1;
         }
 
     } catch (const std::runtime_error& e) {
-        std::cerr << e.what() << std::endl;
+        Logger::log_error(e.what());
         return 1;
     }
 }
