@@ -1,5 +1,6 @@
 #include <iostream>
 #include <string>
+#include <filesystem>
 
 #include "logger.h"
 
@@ -47,6 +48,15 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
     }
 
     throw std::runtime_error("Unhandled pattern " + pattern);
+}
+
+bool is_file(const std::string& input_line) {
+    try {
+        std::filesystem::path file_path(input_line);
+        return !file_path.empty() && file_path.has_filename();
+    } catch (const std::exception& e) {
+        return false;
+    }
 }
 
 int main(int argc, char* argv[]) {
