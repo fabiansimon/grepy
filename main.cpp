@@ -1,6 +1,7 @@
 #include <iostream>
 #include <string>
 #include <filesystem>
+#include <fstream>
 
 #include "logger.h"
 
@@ -59,6 +60,25 @@ bool is_file(const std::string& input_line) {
     }
 }
 
+std::vector<std::string> read_lines(const std::string& file_name) {
+    std::vector<std::string> total_lines;
+
+    std::ifstream input_file(file_name);
+
+    if (!input_file.is_open()) {
+        throw std::runtime_error("Error opening file");
+    }
+
+    std::string line;
+    while (std::getline(input_file, line)) {
+        total_lines.push_back(line);
+    }
+
+    input_file.close();
+
+    return total_lines;
+}
+
 int main(int argc, char* argv[]) {
     // You can use print statements as follows for debugging, they'll be visible when running tests.
     // Logger::log_debug("Logs from your program will appear here");
@@ -86,7 +106,17 @@ int main(int argc, char* argv[]) {
     std::getline(std::cin, input_line);
 
     try {
-        if (match_pattern(input_line, pattern)) {
+        if (is_file(input_line)) {
+            std::vector<std::string> total_lines = read_lines(input_line);
+
+            for (const auto& line : total_lines) {
+                Logger::log_neutral(line);
+            }
+
+            Logger::log_debug("Success");
+            return 0;
+
+        } else if (match_pattern(input_line, pattern)) {
             Logger::log_debug("Success");
             return 0;
         } else {
