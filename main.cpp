@@ -24,10 +24,6 @@ int count_alphanum(const std::string& input) {
 }
 
 bool match_pattern(const std::string& input_line, const std::string& pattern) {
-    if (pattern.length() == 1) {
-        return input_line.find(pattern) != std::string::npos;
-    }
-
     if (pattern.length() == 0) {
         throw std::runtime_error("Must include a pattern");
     }
@@ -47,6 +43,9 @@ bool match_pattern(const std::string& input_line, const std::string& pattern) {
             }
         }
     }
+
+    // text based
+    return input_line.find(pattern) != std::string::npos;
 
     throw std::runtime_error("Unhandled pattern " + pattern);
 }
@@ -79,8 +78,18 @@ std::vector<std::string> read_lines(const std::string& file_name) {
     return total_lines;
 }
 
+void report_results(const std::vector<std::string>& results) {
+    for (const std::string& result : results) {
+        Logger::log_neutral(result);
+    }
+    Logger::log_debug("Success");
+}
+
+void report_results(const std::string& result) {
+    Logger::log_neutral(result);
+}
+
 int main(int argc, char* argv[]) {
-    // You can use print statements as follows for debugging, they'll be visible when running tests.
     // Logger::log_debug("Logs from your program will appear here");
 
     if (argc < 2) {
@@ -91,7 +100,7 @@ int main(int argc, char* argv[]) {
     std::string pattern_arg;
 
     for (int i = 1; i < argc; ++i) {
-        Logger::log_success(argv[i]);
+        // Logger::log_success(argv[i]);
     }
 
     std::string flag = argv[1];
@@ -106,23 +115,31 @@ int main(int argc, char* argv[]) {
     std::getline(std::cin, input_line);
 
     try {
+        // if input is a file
         if (is_file(input_line)) {
             std::vector<std::string> total_lines = read_lines(input_line);
+            std::vector<std::string> matching_lines;
 
-            for (const auto& line : total_lines) {
-                Logger::log_neutral(line);
+            for (int i = 0; i < total_lines.size(); i++) {
+                std::string line = total_lines[i];
+                if (match_pattern(line, pattern)) {
+                    matching_lines.push_back(std::to_string(i+1) + ": " + line);
+                }
             }
 
-            Logger::log_debug("Success");
+            report_results(matching_lines);
             return 0;
-
-        } else if (match_pattern(input_line, pattern)) {
-            Logger::log_debug("Success");
-            return 0;
-        } else {
-            Logger::log_debug("Failure");
-            return 1;
         }
+
+        // if input is a string
+        if (match_pattern(input_line, pattern)) {
+            report_results(input_line);
+            return 0;
+        }
+
+        // failure
+        Logger::log_debug("Failure");
+        return 1;
 
     } catch (const std::runtime_error& e) {
         Logger::log_error(e.what());
